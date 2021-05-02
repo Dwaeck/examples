@@ -11,9 +11,13 @@ import torch
 
 import data
 
+from sacremoses import MosesTokenizer
+mt = MosesTokenizer(lang='en')
+
 parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 Language Model')
 
 # Model parameters.
+parser.add_argument('--input', type=str, required=False, help='additional words')
 parser.add_argument('--data', type=str, default='./data/wikitext-2',
                     help='location of the data corpus')
 parser.add_argument('--checkpoint', type=str, default='./model.pt',
@@ -47,8 +51,17 @@ with open(args.checkpoint, 'rb') as f:
     model = torch.load(f).to(device)
 model.eval()
 
+words = args.input
+tokenized_words = mt.tokenize(words)
+
 corpus = data.Corpus(args.data)
-ntokens = len(corpus.dictionary)
+ntokens = len(corpus.dictionary)+len(tokenized_words)
+
+if args.input is not None:
+    for x in tokenized_words:
+        if x not in corpus.dictionary.idx2word:
+            print(x+'not in dictionary')
+            corpus.dictionary.add_word(x)
 
 is_transformer_model = hasattr(model, 'model_type') and model.model_type == 'Transformer'
 if not is_transformer_model:
