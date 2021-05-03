@@ -60,7 +60,7 @@ ntokens = len(corpus.dictionary)+len(tokenized_words)
 if args.input is not None:
     for x in tokenized_words:
         if x not in corpus.dictionary.idx2word:
-            print(x+'not in dictionary')
+            print(x +'not in dictionary')
             corpus.dictionary.add_word(x)
 
 is_transformer_model = hasattr(model, 'model_type') and model.model_type == 'Transformer'
